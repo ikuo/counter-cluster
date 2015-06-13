@@ -6,7 +6,7 @@ class Frontend extends Actor {
   private val backends = List[ActorRef]()
   var jobCounter = 0
 
-  override def receive = {
+  def receive = {
     case (key: String, value: String) => println(key)
   }
 }
