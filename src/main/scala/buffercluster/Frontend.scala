@@ -11,13 +11,13 @@ class Frontend extends Actor with ActorLogging {
   private var buffers: List[ActorSelection] = Nil
 
   def receive = {
-    case msg : Buffer.Put => buffers.foreach(_ ! msg)
+    case msg : Buffer.Post => buffers.foreach(_ ! msg)
     case MemberUp(member) if member.hasRole("buffer") =>
       val actorRef = context.actorSelection(member.address + "/user/buffer")
       this.buffers = actorRef :: buffers
-      dispatch(Buffer.Put("key2", "value2"))
+      dispatch(Buffer.Post("key2", "value2"))
   }
 
-  private def dispatch(msg: Buffer.Put): Unit =
+  private def dispatch(msg: Buffer.Post): Unit =
     this.buffers.foreach(_ ! msg)
 }

@@ -10,12 +10,12 @@ class Buffer extends Actor with ActorLogging {
   override def postStop: Unit = cluster.unsubscribe(self)
 
   def receive = {
-    case Buffer.Put(key, value) => log.info(s"Put $key=$value")
+    case Buffer.Post(key, value) => log.info(s"Post $key=$value")
     case MemberUp(member) =>
       log.info(s"MemberUp ${member}")
   }
 }
 
 object Buffer {
-  case class Put(key: String, value: String)
+  case class Post(key: String, value: String)
 }
