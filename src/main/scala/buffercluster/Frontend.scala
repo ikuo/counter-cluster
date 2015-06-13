@@ -8,14 +8,5 @@ class Frontend extends Actor {
 
   override def receive = {
     case (key: String, value: String) => println(key)
-    case _ => println("no-match")
-  }
-}
-
-object Frontend {
-  def main(args: Array[String]): Unit = {
-    implicit val system = ActorSystem("frontend")
-    //val frontend = system.actorOf(Props(classOf[Frontend]), "frontend")
-    //frontend ! (("key1", "value1"))
   }
 }
