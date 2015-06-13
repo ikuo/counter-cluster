@@ -12,9 +12,7 @@ class Frontend extends Actor with ActorLogging {
 
   def receive = {
     case msg : Buffer.Put => buffers.foreach(_ ! msg)
-    case state: CurrentClusterState => println(s"${state}============================================================")
     case MemberUp(member) if member.hasRole("buffer") =>
-      log.info(s"Registering a buffer ${member}")
       val actorRef = context.actorSelection(member.address + "/user/buffer")
       this.buffers = actorRef :: buffers
       dispatch(Buffer.Put("key2", "value2"))
