@@ -8,7 +8,8 @@ scalacOptions := Seq("-unchecked", "-deprecation", "-feature", "-encoding", "utf
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" % "akka-cluster_2.11" % "2.4-M1",
-  "com.typesafe.akka" % "akka-cluster-sharding_2.11" % "2.4-M1"
+  "com.typesafe.akka" % "akka-cluster-sharding_2.11" % "2.4-M1",
+  "com.typesafe.akka" %% "akka-persistence-experimental" % "2.4-M1"
 )
 
 Revolver.settings

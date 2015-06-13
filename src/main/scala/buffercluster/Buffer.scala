@@ -17,5 +17,6 @@ class Buffer extends Actor with ActorLogging {
 }
 
 object Buffer {
+  val shardingName = "Buffer"
   case class Post(key: String, value: String)
 }

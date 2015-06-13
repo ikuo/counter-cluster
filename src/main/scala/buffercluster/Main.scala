@@ -1,6 +1,7 @@
 package buffercluster
 
 import akka.actor._
+import akka.cluster.sharding._
 import com.typesafe.config.ConfigFactory
 import scala.collection.JavaConverters._
 
@@ -11,6 +12,15 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem("cluster")
+
+    ClusterSharding(system).start(
+      typeName = Buffer.shardingName,
+      entryProps = Some(Props[Buffer]),
+      roleOverride = None,
+      rememberEntries = false,
+      idExtractor = idExtractor,
+      shardResolver = shardResolver)
+
     primaryRole match {
       case "buffer" => system.actorOf(Props(classOf[Buffer]), "buffer")
       case "frontend" => system.actorOf(Props(classOf[Frontend]), "frontend")
@@ -18,6 +28,14 @@ object Main {
       case role => fatal(s"Unexpected role $role")
     }
     Thread.sleep(10000)
+  }
+
+  val idExtractor: ShardRegion.IdExtractor = {
+    case msg: Buffer.Post => (msg.key, msg)
+  }
+
+  val shardResolver: ShardRegion.ShardResolver = {
+    case msg: Buffer.Post => (msg.key.hashCode % 30).toString
   }
 
   private def fatal(msg: String): Unit = {
