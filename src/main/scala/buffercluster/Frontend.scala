@@ -1,5 +1,4 @@
 package buffercluster
-
 import akka.cluster._
 import akka.cluster.sharding._
 import akka.actor._
@@ -14,13 +13,9 @@ class Frontend extends Actor with ActorLogging {
   def receive = {
     case msg : Buffer.Post => buffers.foreach(_ ! msg)
     case MemberUp(member) =>
-      // this.buffers = actorRef :: buffers
-      // dispatch(Buffer.Post("key2", "value2"))
       log.info(s"MemberUp $member")
-
       //val actorRef = context.actorSelection(member.address + "/user/buffer")
       //actorRef ! Buffer.Post("key0", "value0")
-
       val buffer = ClusterSharding(context.system).shardRegion(Buffer.shardingName)
       buffer ! Buffer.Post(java.util.UUID.randomUUID.toString, "value1")
   }
