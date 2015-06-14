@@ -7,8 +7,10 @@ import ClusterEvent._
 
 class Buffer extends PersistentActor with ActorLogging with Buckets {
   import Buffer._
+  implicit val ec = context.dispatcher
 
   override def persistenceId: String = self.path.parent.name + "-" + self.path.name
+  override def preStart: Unit = loadBuckets.map(_ => self ! Recover())
 
   val receiveCommand: Receive = {
     case Buffer.Post(key, value) =>
