@@ -5,12 +5,19 @@ import akka.cluster.sharding._
 import akka.persistence._
 import ClusterEvent._
 
-class Buffer extends PersistentActor with ActorLogging {
+class Buffer extends PersistentActor with ActorLogging with Buckets {
+  import Buffer._
+
   override def persistenceId: String = self.path.parent.name + "-" + self.path.name
 
   val receiveCommand: Receive = {
-    case Buffer.Post(key, value) => log.info(s"Post $key=$value")
+    case Buffer.Post(key, value) =>
+      createOrUpdateBucketAndPiece(key, value)
+      log.info(s"Post $key=$value")
+
+    case Buffer.Get(key) => sender ! pieces.get(key)
   }
+
   val receiveRecover: Receive = {
     case msg => log.info(s"receiveRecover $msg")
   }
@@ -22,6 +29,7 @@ object Buffer {
     val shardKey = (code % numOfShards).toString
     val entryKey = (code % (numOfShards * 4)).toString
   }
+  case class Get(key: String)
 
   val shardingName = "Buffer"
   val plannedMaxNodes = 6
