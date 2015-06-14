@@ -1,2 +1,4 @@
 target/
+snapshots/
 .idea/
+log/*.log
