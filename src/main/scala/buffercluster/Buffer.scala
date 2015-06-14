@@ -1,7 +1,7 @@
 package buffercluster
-
 import akka.actor._
 import akka.cluster._
+import akka.cluster.sharding._
 import akka.persistence._
 import ClusterEvent._
 
@@ -32,6 +32,25 @@ class Buffer extends PersistentActor with ActorLogging {
 }
 
 object Buffer {
-  val shardingName = "Buffer"
   case class Post(key: String, value: String)
+
+  val shardingName = "Buffer"
+
+  val idExtractor: ShardRegion.IdExtractor = {
+    case msg: Buffer.Post => (msg.key, msg)
+  }
+
+  val shardResolver: ShardRegion.ShardResolver = {
+    case msg: Buffer.Post => (msg.key.hashCode % 30).toString
+  }
+
+  def startSharding(proxyOnlyMode: Boolean = true)(implicit system: ActorSystem): Unit = {
+    ClusterSharding(system).start(
+      typeName = Buffer.shardingName,
+      entryProps = if (proxyOnlyMode) None else Some(Props(classOf[Buffer])),
+      roleOverride = None,
+      rememberEntries = true,
+      idExtractor = idExtractor,
+      shardResolver = shardResolver)
+  }
 }
