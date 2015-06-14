@@ -17,17 +17,16 @@ object Main {
       typeName = Buffer.shardingName,
       entryProps = Some(Props[Buffer]),
       roleOverride = None,
-      rememberEntries = false,
+      rememberEntries = true,
       idExtractor = idExtractor,
       shardResolver = shardResolver)
 
     primaryRole match {
-      case "buffer" => system.actorOf(Props(classOf[Buffer]), "buffer")
+      case "buffer" => //system.actorOf(Props(classOf[Buffer]), "buffer")
       case "frontend" => system.actorOf(Props(classOf[Frontend]), "frontend")
       case "seed" => println(s"Starting seed with $configResource")
       case role => fatal(s"Unexpected role $role")
     }
-    Thread.sleep(10000)
   }
 
   val idExtractor: ShardRegion.IdExtractor = {
