@@ -1,30 +1,29 @@
 package buffercluster
-
 import akka.cluster._
 import akka.cluster.sharding._
 import akka.actor._
 import ClusterEvent._
+import scala.concurrent.duration._
+import java.util.UUID
 
 class Frontend extends Actor with ActorLogging {
-  val cluster = Cluster.get(context.system)
-  override def preStart: Unit = cluster.subscribe(self, ClusterEvent.initialStateAsEvents, classOf[MemberUp])
-  override def postStop: Unit = cluster.unsubscribe(self)
-  private var buffers: List[ActorSelection] = Nil
+  implicit val ec = context.dispatcher
+  val buffer = ClusterSharding(context.system).shardRegion(Buffer.shardingName)
+  var count = 0
+  def random: String = UUID.randomUUID.toString
 
-  def receive = {
-    case msg : Buffer.Post => buffers.foreach(_ ! msg)
-    case MemberUp(member) =>
-      // this.buffers = actorRef :: buffers
-      // dispatch(Buffer.Post("key2", "value2"))
-      log.info(s"MemberUp $member")
-
-      //val actorRef = context.actorSelection(member.address + "/user/buffer")
-      //actorRef ! Buffer.Post("key0", "value0")
-
-      val buffer = ClusterSharding(context.system).shardRegion(Buffer.shardingName)
-      buffer ! Buffer.Post(java.util.UUID.randomUUID.toString, "value1")
+  override def preStart: Unit = {
+    context.system.scheduler.schedule(0.millis, 100.millis) {
+      buffer ! Buffer.Post(s"key-$random", s"value-$random")
+    }
+    super.preStart
   }
 
-  private def dispatch(msg: Buffer.Post): Unit =
-    this.buffers.foreach(_ ! msg)
+  def receive = {
+    case Frontend.GetCount => sender ! count
+  }
+}
+
+object Frontend {
+  object GetCount
 }
