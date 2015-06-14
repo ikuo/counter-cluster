@@ -7,7 +7,7 @@ import ClusterEvent._
 
 class Frontend extends Actor with ActorLogging {
   val cluster = Cluster.get(context.system)
-  override def preStart: Unit = cluster.subscribe(self, classOf[MemberUp])
+  override def preStart: Unit = cluster.subscribe(self, ClusterEvent.initialStateAsEvents, classOf[MemberUp])
   override def postStop: Unit = cluster.unsubscribe(self)
   private var buffers: List[ActorSelection] = Nil
 
@@ -22,7 +22,6 @@ class Frontend extends Actor with ActorLogging {
       //actorRef ! Buffer.Post("key0", "value0")
 
       val buffer = ClusterSharding(context.system).shardRegion(Buffer.shardingName)
-      println(s"${buffer}============================================================")
       buffer ! Buffer.Post(java.util.UUID.randomUUID.toString, "value1")
   }
 

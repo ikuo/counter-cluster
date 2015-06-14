@@ -13,20 +13,24 @@ object Main {
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem("cluster")
 
+    primaryRole match {
+      case "seed" => startSharding()
+      case "buffer" => startSharding(Some(Props(classOf[Buffer])))
+      case "frontend" =>
+        startSharding()
+        system.actorOf(Props(classOf[Frontend]), "frontend")
+      case role => fatal(s"Unexpected role $role")
+    }
+  }
+
+  def startSharding(entryProps: Option[Props] = None)(implicit system: ActorSystem): Unit = {
     ClusterSharding(system).start(
       typeName = Buffer.shardingName,
-      entryProps = Some(Props[Buffer]),
+      entryProps = entryProps,
       roleOverride = None,
       rememberEntries = true,
       idExtractor = idExtractor,
       shardResolver = shardResolver)
-
-    primaryRole match {
-      case "buffer" => //system.actorOf(Props(classOf[Buffer]), "buffer")
-      case "frontend" => system.actorOf(Props(classOf[Frontend]), "frontend")
-      case "seed" => println(s"Starting seed with $configResource")
-      case role => fatal(s"Unexpected role $role")
-    }
   }
 
   val idExtractor: ShardRegion.IdExtractor = {

@@ -6,11 +6,10 @@ import akka.persistence._
 import ClusterEvent._
 
 class Buffer extends PersistentActor with ActorLogging {
-  println(s"Initializing ${self}============================================================")
   val cluster = Cluster.get(context.system)
   override def preStart: Unit = {
     println(s"preStart ${self}============================================================")
-    cluster.subscribe(self, classOf[MemberUp])
+    cluster.subscribe(self, ClusterEvent.initialStateAsEvents, classOf[MemberUp])
     super.preStart
   }
   override def postStop: Unit = {
@@ -21,7 +20,7 @@ class Buffer extends PersistentActor with ActorLogging {
   override def persistenceId: String = self.path.parent.name + "-" + self.path.name
 
   val receiveCommand: Receive = {
-    case Buffer.Post(key, value) => log.info(s"Post $key=$value")
+    case Buffer.Post(key, value) => log.info(s"Post $key=$value @@@@@@@@@@@@@@@@@@@@@@")
     case MemberUp(member) =>
       log.info(s"MemberUp ${member}")
     case msg => log.error(s"Unhandled $msg")
