@@ -23,7 +23,7 @@ class Frontend extends Actor with ActorLogging {
 
       val buffer = ClusterSharding(context.system).shardRegion(Buffer.shardingName)
       println(s"${buffer}============================================================")
-      buffer ! Buffer.Post("key1", "value1")
+      buffer ! Buffer.Post(java.util.UUID.randomUUID.toString, "value1")
   }
 
   private def dispatch(msg: Buffer.Post): Unit =
