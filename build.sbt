@@ -10,12 +10,17 @@ resolvers += "bseibel at bintray" at "http://dl.bintray.com/bseibel/release"
 
 resolvers += ("jdgoldie at bintray" at "http://dl.bintray.com/jdgoldie/maven")
 
-libraryDependencies ++= Seq(
-  "com.typesafe.akka" % "akka-cluster_2.11" % "2.4-M1",
-  "com.typesafe.akka" % "akka-cluster-sharding_2.11" % "2.4-M1",
-  "com.typesafe.akka" %% "akka-persistence-experimental" % "2.4-M1",
-  "com.github.jdgoldie" %% "akka-persistence-shared-inmemory" % "1.0.16"
-)
+libraryDependencies ++= {
+  val awsSdkVersion = "1.9.40"
+  Seq(
+    "com.typesafe.akka" % "akka-cluster_2.11" % "2.4-M1",
+    "com.typesafe.akka" % "akka-cluster-sharding_2.11" % "2.4-M1",
+    "com.typesafe.akka" %% "akka-persistence-experimental" % "2.4-M1",
+    "com.github.jdgoldie" %% "akka-persistence-shared-inmemory" % "1.0.16",
+    "com.amazonaws" % "aws-java-sdk-dynamodb" % awsSdkVersion,
+    "com.amazonaws" % "aws-java-sdk-core" % awsSdkVersion
+  )
+}
 
 assemblyExcludedJars in assembly := {
   val cp = (fullClasspath in assembly).value

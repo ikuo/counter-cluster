@@ -1,5 +1,6 @@
 package buffercluster
 
+import scala.concurrent._
 import scala.collection.mutable.{ HashSet, ArrayBuffer, Buffer => SBuffer, HashMap }
 import Buckets._
 
@@ -15,7 +16,8 @@ trait Buckets {
 
   protected def saveBuckets: Unit = buckets.withFilter(_.isDirty).foreach(_.save)
 
-  protected def loadBuckets: Unit = () // TODO
+  protected def loadBuckets(implicit ec: ExecutionContext): Future[Unit] =
+    Future(()) // TODO
 
   private def newPiece(key: String, value: String) = {
     val piece = Piece(key, value)
