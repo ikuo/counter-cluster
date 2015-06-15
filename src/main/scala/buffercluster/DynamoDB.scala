@@ -6,6 +6,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper
 import com.amazonaws.services.dynamodbv2.{document => aws}
 import com.amazonaws.services.dynamodbv2.model._
+import com.amazonaws.regions.Regions
 import scala.collection.JavaConversions._
 
 object DynamoDB {
@@ -15,7 +16,8 @@ object DynamoDB {
     override def getConnectionTimeout: Int = 2000
   }
   val client: AmazonDynamoDBClient = new AmazonDynamoDBClient(provider.getCredentials, configuration)
-  client.setEndpoint("http://localhost:8000", "", "ap-northeast-1");
+  client.setRegion(Regions.AP_NORTHEAST_1)
+  //client.setEndpoint("http://localhost:8000", "", "ap-northeast-1");
   val mapper: DynamoDBMapper = new DynamoDBMapper(client);
   val db: aws.DynamoDB = new aws.DynamoDB(client)
 
