@@ -55,7 +55,7 @@ object Buckets {
     def isFull = pieces.size >= 10
     def serialized = pieces.map(_.serialized).mkString(",")
     def save(persistenceId: String, bucketId: Int)(implicit ec: ExecutionContext): Future[Unit] = {
-      val entity = new BucketOnDynamoDB(persistenceId, bucketId, s"dummy")
+      val entity = new BucketRecord(persistenceId, bucketId, s"dummy")
       Future {
         mapper.save(entity)
         this.isDirty = false

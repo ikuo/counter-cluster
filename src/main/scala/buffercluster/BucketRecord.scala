@@ -6,7 +6,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable
 
 @DynamoDBTable(tableName = "entries")
-class BucketOnDynamoDB(key: String, bucketId: Int, content: String) {
+class BucketRecord(key: String, bucketId: Int, content: String) {
   private var _key: String = key
   private var _bucketId: Int = bucketId
   private var _content: String = content
