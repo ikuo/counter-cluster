@@ -23,7 +23,7 @@ public class BucketOnDynamoDB {
   public String getKey() { return key; }
   public void setKey(String v) { this.key = v; }
 
-  @DynamoDBRangeKey
+  @DynamoDBRangeKey(attributeName= "bucket-id")
   public int getBucketId() { return bucketId; }
   public void setBucketId(int v) { this.bucketId = v; }
 
