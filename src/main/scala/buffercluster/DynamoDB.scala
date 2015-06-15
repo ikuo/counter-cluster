@@ -20,18 +20,26 @@ object DynamoDB {
   val db: aws.DynamoDB = new aws.DynamoDB(client)
 
   def createTables: Unit = {
-    val keySchema:List[KeySchemaElement] = List(
-      new KeySchemaElement().withAttributeName("key").withKeyType(KeyType.HASH)
+    val keySchema: List[KeySchemaElement] = List(
+      new KeySchemaElement().withAttributeName("key").withKeyType(KeyType.HASH),
+      new KeySchemaElement().withAttributeName("bucket_id").withKeyType(KeyType.RANGE)
     )
     val result = DynamoDB.client.createTable(
       new CreateTableRequest("entries", keySchema)
         .withAttributeDefinitions(
-          new AttributeDefinition().withAttributeName("key").withAttributeType(ScalarAttributeType.N)
+          new AttributeDefinition().withAttributeName("key").withAttributeType(ScalarAttributeType.S)
+        )
+        .withAttributeDefinitions(
+          new AttributeDefinition().withAttributeName("bucket_id").withAttributeType(ScalarAttributeType.N)
         )
         .withProvisionedThroughput(
           new ProvisionedThroughput().withReadCapacityUnits(4l).withWriteCapacityUnits(2l)
         )
     )
     println(result)
+  }
+
+  def deleteTables: Unit = {
+    DynamoDB.client.deleteTable(new DeleteTableRequest("entries"))
   }
 }

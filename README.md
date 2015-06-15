@@ -13,6 +13,14 @@ $ open http://localhost:8000/shell/
 $ [Ctrl-C]
 ```
 
+Create table:
+
+```
+sbt console
+> buffercluster.createTables
+```
+
+
 # Running
 
 ```
