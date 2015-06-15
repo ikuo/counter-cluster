@@ -9,7 +9,7 @@ class Buffer extends PersistentActor with ActorLogging with Buckets {
   import Buffer._
   implicit val ec = context.dispatcher
 
-  override def persistenceId: String = self.path.parent.name + "-" + self.path.name
+  override val persistenceId: String = shardingName + "-" + self.path.name
   override def preStart: Unit = loadBuckets.map(_ => self ! Recover())
 
   val receiveCommand: Receive = {
@@ -26,21 +26,19 @@ class Buffer extends PersistentActor with ActorLogging with Buckets {
 }
 
 object Buffer {
-  case class Post(key: String, value: String) {
-    val code = key.hashCode
-    val shardKey = (code % numOfShards).toString
-    val entryKey = (code % (numOfShards * 4)).toString
-  }
+  def shardKey(id: String) = (id.hashCode % numOfShards).toString
+  def entryKey(id: String) = (id.hashCode % (numOfShards * 4)).toString
+  case class Post(id: String, value: String)
   case class Get(key: String)
 
   val shardingName = "Buffer"
   val plannedMaxNodes = 6
   val numOfShards = plannedMaxNodes * 10
   val idExtractor: ShardRegion.IdExtractor = {
-    case msg: Buffer.Post => (msg.entryKey, msg)
+    case msg: Buffer.Post => (entryKey(msg.id), msg)
   }
   val shardResolver: ShardRegion.ShardResolver = {
-    case msg: Buffer.Post => msg.shardKey
+    case msg: Buffer.Post => shardKey(msg.id)
   }
 
   def startSharding(proxyOnlyMode: Boolean = true)(implicit system: ActorSystem): Unit = {

@@ -5,6 +5,8 @@ import scala.collection.mutable.{ HashSet, ArrayBuffer, Buffer => SBuffer, HashM
 import Buckets._
 
 trait Buckets {
+  implicit val ec: ExecutionContext
+  val persistenceId: String
   val buckets = ArrayBuffer[Bucket]()
   val pieces = HashMap[String, Tuple2[Piece, Bucket]]()
 
@@ -14,7 +16,10 @@ trait Buckets {
     bucket.isDirty = true
   }
 
-  protected def saveBuckets: Unit = buckets.withFilter(_.isDirty).foreach(_.save)
+  protected def saveBuckets: Seq[Future[Unit]] =
+    buckets.zipWithIndex.withFilter(_._1.isDirty).map {
+      case (bucket, index) => bucket.save(persistenceId, index)
+    }
 
   protected def loadBuckets(implicit ec: ExecutionContext): Future[Unit] =
     Future(()) // TODO
@@ -34,12 +39,30 @@ trait Buckets {
 }
 
 object Buckets {
-  case class Piece(key: String, var value: String)
+  val mapper = DynamoDB.mapper
+
+  case class Piece(key: String, var value: String) {
+    val serialized = List(key, value).mkString(":")
+  }
+  object Piece {
+    def apply(string: String): Piece = string.split(":").toList match {
+      case key :: value :: Nil => Piece(key, value)
+      case _ => sys.error(s"Malformed piece $string")
+    }
+  }
+
   case class Bucket(pieces: HashSet[Piece] = HashSet.empty[Piece], var isDirty: Boolean = false) {
     def isFull = pieces.size >= 10
-    def save: Unit = {
-      //TODO
-      this.isDirty = false
+    def serialized = pieces.map(_.serialized).mkString(",")
+    def save(persistenceId: String, bucketId: Int)(implicit ec: ExecutionContext): Future[Unit] = {
+      val entity = new BucketOnDynamoDB(persistenceId, bucketId, s"dummy")
+      Future {
+        mapper.save(entity)
+        this.isDirty = false
+      }
     }
+  }
+  object Bucket {
+    def apply(string: String): Bucket = Bucket(pieces = HashSet(string.split(",").map(Piece(_)): _*))
   }
 }
