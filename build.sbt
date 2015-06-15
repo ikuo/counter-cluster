@@ -18,7 +18,8 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-persistence-experimental" % "2.4-M1",
     "com.github.jdgoldie" %% "akka-persistence-shared-inmemory" % "1.0.16",
     "com.amazonaws" % "aws-java-sdk-dynamodb" % awsSdkVersion,
-    "com.amazonaws" % "aws-java-sdk-core" % awsSdkVersion
+    "com.amazonaws" % "aws-java-sdk-core" % awsSdkVersion,
+    "org.specs2" %% "specs2-core" % "3.6" % "test"
   )
 }
 
