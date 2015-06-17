@@ -23,6 +23,11 @@ class Buffer extends PersistentActor with ActorLogging with Buckets {
   val receiveRecover: Receive = {
     case msg => log.info(s"receiveRecover $msg")
   }
+
+  override def postStop: Unit = {
+    saveBuckets
+    super.postStop()
+  }
 }
 
 object Buffer {
