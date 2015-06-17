@@ -1,4 +1,5 @@
 package buffercluster
+import scala.concurrent.duration._
 import akka.actor._
 import akka.cluster._
 import akka.cluster.sharding._
@@ -10,9 +11,8 @@ class Buffer extends PersistentActor with ActorLogging with Buckets {
   implicit val ec = context.dispatcher
 
   override val persistenceId: String = shardingName + "-" + self.path.name
-  override def preStart: Unit = loadBuckets.map(_ => self ! Recover())
 
-  val receiveCommand: Receive = {
+  override val receiveCommand: Receive = {
     case Buffer.Post(key, value) =>
       createOrUpdateBucketAndPiece(key, value)
       log.info(s"Post $key=$value")
@@ -20,8 +20,16 @@ class Buffer extends PersistentActor with ActorLogging with Buckets {
     case Buffer.Get(key) => sender ! pieces.get(key)
   }
 
-  val receiveRecover: Receive = {
+  override val receiveRecover: Receive = {
     case msg => log.info(s"receiveRecover $msg")
+  }
+
+  override def preStart: Unit = {
+    loadBuckets.map { _ =>
+      context.system.scheduler.schedule(0.seconds, 10.seconds)(saveBuckets)
+      self ! Recover()
+    }
+    super.preStart()
   }
 
   override def postStop: Unit = {
