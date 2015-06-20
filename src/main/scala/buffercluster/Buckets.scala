@@ -51,7 +51,7 @@ object Buckets {
   val mapper = DynamoDB.mapper
 
   case class Piece(key: String, var value: String) {
-    val serialized = List(key, value).mkString(":")
+    def serialized = List(key, value).mkString(":")
   }
   object Piece {
     def apply(string: String): Piece = string.split(":").toList match {
@@ -64,7 +64,7 @@ object Buckets {
     def isFull = pieces.size >= 10
     def serialized = pieces.map(_.serialized).mkString(",")
     def save(persistenceId: String, bucketId: Int)(implicit ec: ExecutionContext): Future[Unit] = {
-      val entity = new BucketRecord(persistenceId, bucketId, s"dummy")
+      val entity = new BucketRecord(persistenceId, bucketId, serialized)
       Future {
         mapper.save(entity)
         this.isDirty = false
