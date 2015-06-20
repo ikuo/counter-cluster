@@ -28,4 +28,6 @@ assemblyExcludedJars in assembly := {
   cp filter {_.data.getName.endsWith("-javadoc.jar")}
 }
 
+test in assembly := {}
+
 Revolver.settings
