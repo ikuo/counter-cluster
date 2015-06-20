@@ -2,6 +2,7 @@ package buffercluster
 
 import scala.concurrent._
 import scala.collection.mutable.{ HashSet, ArrayBuffer, Buffer => SBuffer, HashMap }
+import com.amazonaws.services.dynamodbv2.datamodeling._
 import Buckets._
 
 trait Buckets {
@@ -21,8 +22,16 @@ trait Buckets {
       case (bucket, index) => bucket.save(persistenceId, index)
     }
 
-  protected def loadBuckets(implicit ec: ExecutionContext): Future[Unit] =
-    Future(()) // TODO
+  protected def loadBuckets(implicit ec: ExecutionContext): Future[Unit] = Future {
+    buckets.clear()
+    val it = {
+      val query = new DynamoDBQueryExpression().
+        withHashKeyValues(new BucketRecord(persistenceId))
+      val list = mapper.query(classOf[BucketRecord], query)
+      list.iterator
+    }
+    while (it.hasNext) { buckets.append(Bucket(it.next.content)) }
+  }
 
   private def newPiece(key: String, value: String) = {
     val piece = Piece(key, value)

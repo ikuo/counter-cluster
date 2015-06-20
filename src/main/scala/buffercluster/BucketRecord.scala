@@ -3,7 +3,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling._
 
 @DynamoDBTable(tableName = "entries")
 case class BucketRecord(var key: String, var bucketId: Int, var content: String) {
-  def this() = this("", -1, "")
+  def this(key: String) = this(key, -1, "")
+  def this() = this("")
 
   @DynamoDBHashKey
   def getKey = key
