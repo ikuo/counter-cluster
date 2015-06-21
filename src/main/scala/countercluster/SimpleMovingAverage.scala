@@ -1,10 +1,15 @@
 package countercluster
 import com.google.common.collect.EvictingQueue
 
-case class MovingAverage(intervalMs: Long, numOfIntervals: Int) {
+case class MovingAverage(
+  intervalMs: Long,
+  numOfIntervals: Int,
+  initialCount: Int = 0,
+  _queue: Option[EvictingQueue[Int]] = None) {
+  import MovingAverage._
   private var startedAt = System.currentTimeMillis()
-  private var _count = 0
-  private val queue = EvictingQueue.create[Int](numOfIntervals)
+  private var _count = initialCount
+  private val queue = _queue.getOrElse(EvictingQueue.create[Int](numOfIntervals))
 
   def increment: Unit = { refresh; this._count += 1 }
 
@@ -26,6 +31,28 @@ case class MovingAverage(intervalMs: Long, numOfIntervals: Int) {
     result / queue.size
   }
 
-  def values = queue.toArray
+  def values: List[Int] = {
+    var result: List[Int] = Nil
+    val it = queue.iterator
+    while(it.hasNext) { result = it.next :: result }
+    result
+  }
   def count = _count
+
+  def serialize = (intervalMs :: numOfIntervals :: _count :: values).mkString(delimiter)
+}
+
+object MovingAverage {
+  val delimiter = ";"
+  def makeQueue(size: Int, values: List[String]) = {
+    val queue = EvictingQueue.create[Int](size)
+    values.map(_.toInt).reverse.foreach(queue.add(_))
+    queue
+  }
+  def parse(string: String) = string.split(delimiter).toList match {
+    case intervalMs :: _size :: count :: values =>
+      val size = _size.toInt
+      MovingAverage(intervalMs.toLong, size, count.toInt, Some(makeQueue(size, values)))
+    case _ => sys.error(s"Malformed MovingAverage '$string'")
+  }
 }
