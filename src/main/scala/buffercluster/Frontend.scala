@@ -19,7 +19,7 @@ class Frontend extends Actor with ActorLogging {
 
   override def preStart: Unit = {
     context.system.scheduler.schedule(0.millis, 100.millis) {
-      val trace = Kamon.tracer.newContext("frontend_tell")
+      val trace = Kamon.tracer.newContext("frontend")
       buffer.ask(Buffer.Post(s"key-$random", s"value-$random")).
         recover { case err => throw err }.
         map { i => println(i) }.
