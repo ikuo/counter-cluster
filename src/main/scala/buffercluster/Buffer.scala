@@ -16,6 +16,7 @@ class Buffer extends PersistentActor with ActorLogging with Buckets {
     case Buffer.Post(key, value) =>
       createOrUpdateBucketAndPiece(key, value)
       log.info(s"Post $key=$value")
+      sender ! 5
 
     case Buffer.Get(key) => sender ! pieces.get(key)
   }

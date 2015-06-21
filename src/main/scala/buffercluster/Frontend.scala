@@ -2,9 +2,12 @@ package buffercluster
 import akka.cluster._
 import akka.cluster.sharding._
 import akka.actor._
+import akka.pattern.ask
+import akka.util.Timeout
 import ClusterEvent._
 import scala.concurrent.duration._
 import java.util.UUID
+import kamon.Kamon
 import kamon.trace.Tracer
 
 class Frontend extends Actor with ActorLogging {
@@ -12,12 +15,15 @@ class Frontend extends Actor with ActorLogging {
   val buffer = ClusterSharding(context.system).shardRegion(Buffer.shardingName)
   var count = 0
   def random: String = UUID.randomUUID.toString
+  implicit val timeout = Timeout(5.seconds)
 
   override def preStart: Unit = {
     context.system.scheduler.schedule(0.millis, 100.millis) {
-      Tracer.withNewContext("frontend_tell", autoFinish = true) {
-        buffer ! Buffer.Post(s"key-$random", s"value-$random")
-      }
+      val trace = Kamon.tracer.newContext("frontend_tell")
+      buffer.ask(Buffer.Post(s"key-$random", s"value-$random")).
+        recover { case err => throw err }.
+        map { i => println(i) }.
+        onComplete { _ => trace.finish() }
     }
     super.preStart
   }
