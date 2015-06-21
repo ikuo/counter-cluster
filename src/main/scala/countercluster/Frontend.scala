@@ -16,7 +16,7 @@ class Frontend extends Actor with ActorLogging {
   var count = 0
   val random = new Random(0)
   implicit val timeout = Timeout(5.seconds)
-  val numOfKeys = 10000
+  val numOfKeys = 10//000
 
   override def preStart: Unit = {
     context.system.scheduler.schedule(0.millis, 100.millis) {

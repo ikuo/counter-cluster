@@ -7,6 +7,7 @@ case class SimpleMovingAverage(
   initialCount: Int = 0,
   _queue: Option[EvictingQueue[Int]] = None) {
   import SimpleMovingAverage._
+  require(intervalSec > 0)
   private var startedAt = System.currentTimeMillis() / 1000
   private var _count = initialCount
   private val queue = _queue.getOrElse(EvictingQueue.create[Int](numOfIntervals))
@@ -24,12 +25,9 @@ case class SimpleMovingAverage(
     (2L to expiredSlots).foreach(_ => queue.add(0))
   }
 
-  def value: Double = {
-    var result = 0
-    val it = queue.iterator
-    while(it.hasNext) { result += it.next }
-    result / queue.size
-  }
+  def value: Double =
+    if (queue.size == 0) { 0 }
+    else { values.sum.toDouble / values.size }
 
   def values: List[Int] = {
     var result: List[Int] = Nil
