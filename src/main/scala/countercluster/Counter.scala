@@ -14,10 +14,9 @@ class Counter extends PersistentActor with ActorLogging with Buckets[SimpleMovin
 
   override val receiveCommand: Receive = {
     case Counter.Post(key) =>
-      val value = getValue(key).getOrElse(SimpleMovingAverage(1, 6))
+      val value = getValue(key).getOrElse(SimpleMovingAverage(10, 6))
       value.increment
       createOrUpdateBucketAndPiece(key, value)
-      log.info(s"Post $key")
       sender ! value.value
 
     case Counter.Get(key) => sender ! getValue(key).map(_.value)
