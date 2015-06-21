@@ -3,6 +3,8 @@
 ```
 $ brew install forego
 $ brew install dynamodb-local
+$ pushd /tmp && git clone git@github.com:kamon-io/Kamon.git && git checkout release-akka-2.4 && sbt publishLocal
+$ wget http://central.maven.org/maven2/org/aspectj/aspectjweaver/1.8.6/aspectjweaver-1.8.6.jar
 ```
 
 Confirm that `dynamodb-local` should work:

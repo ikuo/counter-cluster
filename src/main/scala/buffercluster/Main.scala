@@ -1,5 +1,6 @@
 package buffercluster
 import akka.actor._
+import kamon.Kamon
 import com.typesafe.config.ConfigFactory
 import scala.collection.JavaConverters._
 
@@ -8,6 +9,7 @@ object Main {
   val primaryRole: String = roles.headOption.getOrElse(sys.error("akka.cluster.roles is empty"))
 
   def main(args: Array[String]): Unit = {
+    Kamon.start
     implicit val system = ActorSystem("cluster")
     primaryRole match {
       case "seed" => Buffer.startSharding()
