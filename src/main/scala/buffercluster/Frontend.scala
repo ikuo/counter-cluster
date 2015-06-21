@@ -5,6 +5,7 @@ import akka.actor._
 import ClusterEvent._
 import scala.concurrent.duration._
 import java.util.UUID
+import kamon.trace.Tracer
 
 class Frontend extends Actor with ActorLogging {
   implicit val ec = context.dispatcher
@@ -14,7 +15,9 @@ class Frontend extends Actor with ActorLogging {
 
   override def preStart: Unit = {
     context.system.scheduler.schedule(0.millis, 100.millis) {
-      buffer ! Buffer.Post(s"key-$random", s"value-$random")
+      Tracer.withNewContext("frontend_tell", autoFinish = true) {
+        buffer ! Buffer.Post(s"key-$random", s"value-$random")
+      }
     }
     super.preStart
   }
