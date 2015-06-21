@@ -10,10 +10,12 @@ resolvers += "bseibel at bintray" at "http://dl.bintray.com/bseibel/release"
 
 resolvers += ("jdgoldie at bintray" at "http://dl.bintray.com/jdgoldie/maven")
 
+resolvers += Resolver.file("ivy-local", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns)
+
 libraryDependencies ++= {
   val akkaVersion = "2.4-M1"
   val awsSdkVersion = "1.9.40"
-  val kamonVersion = "0.4.0"
+  val kamonVersion = "0.4.1-35bb09838d1b0a2a1e36cd68c2db158b728a2981"
   Seq(
     "com.typesafe.akka" % "akka-cluster_2.11" % akkaVersion,
     "com.typesafe.akka" % "akka-cluster-sharding_2.11" % akkaVersion,
@@ -21,10 +23,10 @@ libraryDependencies ++= {
     "com.github.jdgoldie" %% "akka-persistence-shared-inmemory" % "1.0.16",
     "com.amazonaws" % "aws-java-sdk-dynamodb" % awsSdkVersion,
     "com.amazonaws" % "aws-java-sdk-core" % awsSdkVersion,
-    "io.kamon" %% "kamon-core" % kamonVersion,
-    "io.kamon" %% "kamon-scala" % kamonVersion,
-    "io.kamon" %% "kamon-akka" % kamonVersion,
-    "io.kamon" %% "kamon-datadog" % kamonVersion,
+    "io.kamon" %% "kamon-core_akka-2.4" % kamonVersion,
+    "io.kamon" %% "kamon-scala_akka-2.4" % kamonVersion,
+    "io.kamon" %% "kamon-akka_akka-2.4" % kamonVersion,
+    "io.kamon" %% "kamon-datadog_akka-2.4" % kamonVersion,
     "org.specs2" %% "specs2-core" % "3.6" % "test"
   )
 }

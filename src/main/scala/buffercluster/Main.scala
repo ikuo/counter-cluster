@@ -9,8 +9,8 @@ object Main {
   val primaryRole: String = roles.headOption.getOrElse(sys.error("akka.cluster.roles is empty"))
 
   def main(args: Array[String]): Unit = {
-    implicit val system = ActorSystem("cluster")
     Kamon.start
+    implicit val system = ActorSystem("cluster")
     primaryRole match {
       case "seed" => Buffer.startSharding()
       case "buffer" => Buffer.startSharding(proxyOnlyMode = false)
