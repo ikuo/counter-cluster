@@ -1,12 +1,12 @@
 package countercluster
 import com.google.common.collect.EvictingQueue
 
-case class MovingAverage(
+case class SimpleMovingAverage(
   intervalMs: Long,
   numOfIntervals: Int,
   initialCount: Int = 0,
   _queue: Option[EvictingQueue[Int]] = None) {
-  import MovingAverage._
+  import SimpleMovingAverage._
   private var startedAt = System.currentTimeMillis()
   private var _count = initialCount
   private val queue = _queue.getOrElse(EvictingQueue.create[Int](numOfIntervals))
@@ -42,7 +42,7 @@ case class MovingAverage(
   def serialize = (intervalMs :: numOfIntervals :: _count :: values).mkString(delimiter)
 }
 
-object MovingAverage {
+object SimpleMovingAverage {
   val delimiter = ";"
   def makeQueue(size: Int, values: List[String]) = {
     val queue = EvictingQueue.create[Int](size)
@@ -52,7 +52,7 @@ object MovingAverage {
   def parse(string: String) = string.split(delimiter).toList match {
     case intervalMs :: _size :: count :: values =>
       val size = _size.toInt
-      MovingAverage(intervalMs.toLong, size, count.toInt, Some(makeQueue(size, values)))
-    case _ => sys.error(s"Malformed MovingAverage '$string'")
+      SimpleMovingAverage(intervalMs.toLong, size, count.toInt, Some(makeQueue(size, values)))
+    case _ => sys.error(s"Malformed SimpleMovingAverage '$string'")
   }
 }
