@@ -16,10 +16,10 @@ class Frontend extends Actor with ActorLogging {
   var count = 0
   val random = new Random(0)
   implicit val timeout = Timeout(5.seconds)
-  val numOfKeys = 10000
+  val numOfKeys = 1000
 
   override def preStart: Unit = {
-    context.system.scheduler.schedule(0.millis, 100.millis) {
+    context.system.scheduler.schedule(0.millis, 20.millis) {
       val trace = Kamon.tracer.newContext("frontend")
       counter.ask(Counter.Post(s"key${random.nextInt(numOfKeys)}")).
         recover { case err => throw err }.
