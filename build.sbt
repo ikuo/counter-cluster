@@ -22,6 +22,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" % "akka-cluster-sharding_2.11" % akkaVersion,
     "com.typesafe.akka" %% "akka-persistence-experimental" % akkaVersion,
     "com.github.jdgoldie" %% "akka-persistence-shared-inmemory" % "1.0.16",
+    "com.google.guava" % "guava" % "18.0",
     "com.amazonaws" % "aws-java-sdk-dynamodb" % awsSdkVersion,
     "com.amazonaws" % "aws-java-sdk-core" % awsSdkVersion,
     "io.kamon" %% s"kamon-core$kamonSuffix" % kamonVersion,
