@@ -1,5 +1,6 @@
 package buffercluster
 import akka.actor._
+import kamon.Kamon
 import com.typesafe.config.ConfigFactory
 import scala.collection.JavaConverters._
 
@@ -9,6 +10,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem("cluster")
+    Kamon.start
     primaryRole match {
       case "seed" => Buffer.startSharding()
       case "buffer" => Buffer.startSharding(proxyOnlyMode = false)
