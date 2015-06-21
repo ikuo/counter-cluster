@@ -6,16 +6,16 @@ import akka.cluster.sharding._
 import akka.persistence._
 import ClusterEvent._
 
-class Buffer extends PersistentActor with ActorLogging with Buckets {
+class Buffer extends PersistentActor with ActorLogging with Buckets[String] {
   import Buffer._
   implicit val ec = context.dispatcher
 
   override val persistenceId: String = shardingName + "-" + self.path.name
 
   override val receiveCommand: Receive = {
-    case Buffer.Post(key, value) =>
-      createOrUpdateBucketAndPiece(key, value)
-      log.info(s"Post $key=$value")
+    case Buffer.Post(key) =>
+      createOrUpdateBucketAndPiece(key, "dummy")
+      log.info(s"Post $key")
       sender ! 5
 
     case Buffer.Get(key) => sender ! pieces.get(key)
@@ -37,12 +37,15 @@ class Buffer extends PersistentActor with ActorLogging with Buckets {
     saveBuckets
     super.postStop()
   }
+
+  protected def parse(key: String, value: String) = Piece(key, value)
+  protected def serialize(piece: Piece): String = List(piece.key, piece.value).mkString(":")
 }
 
 object Buffer {
   def shardKey(id: String) = (id.hashCode % numOfShards).toString
   def entryKey(id: String) = (id.hashCode % (numOfShards * 4)).toString
-  case class Post(id: String, value: String)
+  case class Post(id: String)
   case class Get(key: String)
 
   val shardingName = "Buffer"

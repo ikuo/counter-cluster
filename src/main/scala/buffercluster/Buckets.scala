@@ -3,15 +3,14 @@ package buffercluster
 import scala.concurrent._
 import scala.collection.mutable.{ HashSet, ArrayBuffer, Buffer => SBuffer, HashMap }
 import com.amazonaws.services.dynamodbv2.datamodeling._
-import Buckets._
 
-trait Buckets {
+trait Buckets[Value] {
   implicit val ec: ExecutionContext
   val persistenceId: String
   val buckets = ArrayBuffer[Bucket]()
   val pieces = HashMap[String, Tuple2[Piece, Bucket]]()
 
-  protected def createOrUpdateBucketAndPiece(key: String, value: String): Unit = {
+  protected def createOrUpdateBucketAndPiece(key: String, value: Value): Unit = {
     val (piece, bucket) = pieces.getOrElseUpdate(key, newPiece(key, value))
     piece.value = value
     bucket.isDirty = true
@@ -33,7 +32,7 @@ trait Buckets {
     while (it.hasNext) { buckets.append(Bucket(it.next.content)) }
   }
 
-  private def newPiece(key: String, value: String) = {
+  private def newPiece(key: String, value: Value) = {
     val piece = Piece(key, value)
     val bucket: Bucket = buckets.lastOption.filterNot(_.isFull).getOrElse(newBucket)
     bucket.pieces.add(piece)
@@ -45,24 +44,23 @@ trait Buckets {
     buckets.append(bkt)
     bkt
   }
-}
 
-object Buckets {
+  protected def parse(key: String, value: String): Piece
+  protected def serialize(piece: Piece): String
+
   val mapper = DynamoDB.mapper
 
-  case class Piece(key: String, var value: String) {
-    def serialized = List(key, value).mkString(":")
-  }
+  case class Piece(key: String, var value: Value)
   object Piece {
     def apply(string: String): Piece = string.split(":").toList match {
-      case key :: value :: Nil => Piece(key, value)
+      case key :: value :: Nil => parse(key, value)
       case _ => sys.error(s"Malformed piece $string")
     }
   }
 
   case class Bucket(pieces: HashSet[Piece] = HashSet.empty[Piece], var isDirty: Boolean = false) {
     def isFull = pieces.size >= 10
-    def serialized = pieces.map(_.serialized).mkString(",")
+    def serialized = pieces.map(serialize(_)).mkString(",")
     def save(persistenceId: String, bucketId: Int)(implicit ec: ExecutionContext): Future[Unit] = {
       val entity = new BucketRecord(persistenceId, bucketId, serialized)
       Future {

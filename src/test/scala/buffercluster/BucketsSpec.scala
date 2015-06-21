@@ -21,9 +21,6 @@ class BucketsSpec extends SpecificationLike {
 
           it.buckets.size must be_==(1)
           it.buckets(0).pieces.size must be_==(2)
-          it.buckets(0).pieces must not contain(Buckets.Piece("key001", "value001"))
-          it.buckets(0).pieces must contain(Buckets.Piece("key001", "value002"))
-          it.buckets(0).pieces must contain(Buckets.Piece("key003", "value003"))
         }
       }
 
@@ -45,12 +42,14 @@ class BucketsSpec extends SpecificationLike {
   }
 
   trait BucketsCheck extends Scope {
-    class TargetBucket(id: String) extends Buckets {
+    class TargetBucket(id: String) extends Buckets[String] {
       override val persistenceId = id
       override val ec = ExecutionContext.Implicits.global
       def put(key: String, value: String) = createOrUpdateBucketAndPiece(key, value)
       def save = saveBuckets
       def load = loadBuckets
+      protected def parse(key: String, value: String) = Piece(key, value)
+      protected def serialize(piece: Piece): String = List(piece.key, piece.value).mkString(":")
     }
   }
 }
