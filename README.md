@@ -12,7 +12,6 @@ Confirm that `dynamodb-local` should work:
 ```
 $ dynamodb-local
 $ open http://localhost:8000/shell/
-$ [Ctrl-C]
 ```
 
 Create table:
