@@ -1,3 +1,5 @@
+A playground of Akka Cluster/ClusterSharding (on DynamoDB)
+
 # Setup
 
 ```
