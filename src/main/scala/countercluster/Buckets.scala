@@ -61,8 +61,9 @@ trait Buckets[Value] {
   }
 
   case class Bucket(pieces: HashSet[Piece] = HashSet.empty[Piece], var isDirty: Boolean = false) {
+    import Bucket._
     def isFull = pieces.size >= 10
-    def serialized = pieces.map(serialize(_)).mkString(",")
+    def serialized = pieces.map(serialize(_)).mkString(delimiter)
     def save(persistenceId: String, bucketId: Int)(implicit ec: ExecutionContext): Future[Unit] = {
       val entity = new BucketRecord(persistenceId, bucketId, serialized)
       Future {
@@ -72,6 +73,7 @@ trait Buckets[Value] {
     }
   }
   object Bucket {
-    def apply(string: String): Bucket = Bucket(pieces = HashSet(string.split(",").map(Piece(_)): _*))
+    val delimiter = "/"
+    def apply(string: String): Bucket = Bucket(pieces = HashSet(string.split(delimiter).map(Piece(_)): _*))
   }
 }
