@@ -12,6 +12,8 @@ resolvers += ("jdgoldie at bintray" at "http://dl.bintray.com/jdgoldie/maven")
 
 resolvers += Resolver.file("ivy-local", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns)
 
+resolvers += "Scalaz Bintray Repo" at "https://dl.bintray.com/scalaz/releases"
+
 libraryDependencies ++= {
   val akkaVersion = "2.4-M1"
   val awsSdkVersion = "1.9.40"
