@@ -23,16 +23,22 @@ sbt console
 > countercluster.DynamoDB.createTables
 ```
 
-
-# Running
+# Running in sbt
 
 ```
 $ sbt assembly
 $ forego start
 ```
 
+# Running in Docker
+
+```
+$ ./scripts/docker-build.sh
+$ docker run -itd $(whoami)/counter-cluster --env="CONFIG=/seed1.conf"
+```
+
 # Development
 
 ```
-sbt> ~re-start --- -Dconfig.resource=/frontend.conf
+sbt> ~re-start --- -Dconfig.resource=/seed1.conf
 ```
