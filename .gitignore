@@ -1,5 +1,6 @@
 target/
 snapshots/
 .idea/
-log/*.log
+/log/*.log
+/docker/*.jar
 /*.jar
