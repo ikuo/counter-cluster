@@ -40,7 +40,7 @@ class Counter extends PersistentActor with ActorLogging with Buckets[SMA] {
   }
 
   protected def parse(key: String, value: String) = Piece(key, SMA.parse(value))
-  protected def serialize(piece: Piece): String = List(piece.key, piece.value).mkString(":")
+  protected def serialize(piece: Piece): String = List(piece.key, piece.value.serialize).mkString(":")
 }
 
 object Counter {
