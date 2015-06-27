@@ -6,7 +6,7 @@ import akka.cluster.sharding._
 import akka.persistence._
 import ClusterEvent._
 
-class Counter extends PersistentActor with ActorLogging with Buckets[SMA] {
+class Counter extends PersistentActor with ActorLogging with Buckets[SimpleMovingAverage] {
   import Counter._
   implicit val ec = context.dispatcher
 
@@ -14,7 +14,7 @@ class Counter extends PersistentActor with ActorLogging with Buckets[SMA] {
 
   override val receiveCommand: Receive = {
     case Counter.Post(key) =>
-      val value = getValue(key).getOrElse(SMA(10, 6))
+      val value = getValue(key).getOrElse(SimpleMovingAverage(10, 6))
       value.increment
       createOrUpdateBucketAndPiece(key, value)
       sender ! value.value
@@ -39,7 +39,7 @@ class Counter extends PersistentActor with ActorLogging with Buckets[SMA] {
     super.postStop()
   }
 
-  protected def parse(key: String, value: String) = Piece(key, SMA.parse(value))
+  protected def parse(key: String, value: String) = Piece(key, SimpleMovingAverage.parse(value))
   protected def serialize(piece: Piece): String = List(piece.key, piece.value.serialize).mkString(":")
 }
 
