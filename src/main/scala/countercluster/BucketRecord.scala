@@ -10,7 +10,7 @@ case class BucketRecord(var key: String, var bucketId: Int, var content: String)
   def getKey = key
   def setKey(v: String): Unit = { this.key = v }
 
-  @DynamoDBRangeKey(attributeName= "bucket-id")
+  @DynamoDBRangeKey(attributeName = "bucket-id")
   def getBucketId = bucketId
   def setBucketId(v: Int): Unit = { this.bucketId = v; }
 

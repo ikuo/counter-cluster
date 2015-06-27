@@ -12,7 +12,7 @@ object Main {
     Kamon.start
     implicit val system = ActorSystem("cluster")
     primaryRole match {
-      case "seed" => Counter.startSharding()
+      case "seed"    => Counter.startSharding()
       case "counter" => Counter.startSharding(proxyOnlyMode = false)
       case "frontend" =>
         Counter.startSharding()

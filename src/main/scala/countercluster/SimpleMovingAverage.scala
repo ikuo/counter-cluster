@@ -2,10 +2,10 @@ package countercluster
 import com.google.common.collect.EvictingQueue
 
 case class SimpleMovingAverage(
-  intervalSec: Long,
-  numOfIntervals: Int,
-  initialCount: Int = 0,
-  _queue: Option[EvictingQueue[Int]] = None) {
+    intervalSec: Long,
+    numOfIntervals: Int,
+    initialCount: Int = 0,
+    _queue: Option[EvictingQueue[Int]] = None) {
   import SimpleMovingAverage._
   require(intervalSec > 0)
   private var startedAt = System.currentTimeMillis() / 1000
@@ -32,7 +32,7 @@ case class SimpleMovingAverage(
   def values: List[Int] = {
     var result: List[Int] = Nil
     val it = queue.iterator
-    while(it.hasNext) { result = it.next :: result }
+    while (it.hasNext) { result = it.next :: result }
     result
   }
   def count = _count

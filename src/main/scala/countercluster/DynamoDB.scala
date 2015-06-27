@@ -4,7 +4,7 @@ import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper
-import com.amazonaws.services.dynamodbv2.{document => aws}
+import com.amazonaws.services.dynamodbv2.{ document => aws }
 import com.amazonaws.services.dynamodbv2.model._
 import com.amazonaws.regions.Regions
 import scala.collection.JavaConversions._

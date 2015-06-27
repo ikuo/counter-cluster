@@ -56,7 +56,7 @@ trait Buckets[Value] {
   object Piece {
     def apply(string: String): Piece = string.split(":").toList match {
       case key :: value :: Nil => parse(key, value)
-      case _ => sys.error(s"Malformed piece $string")
+      case _                   => sys.error(s"Malformed piece $string")
     }
   }
 
