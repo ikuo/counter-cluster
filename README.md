@@ -34,7 +34,7 @@ $ forego start
 
 ```
 $ ./scripts/docker-build.sh
-$ docker run -itd $(whoami)/counter-cluster --env="CONFIG=/seed1.conf"
+$ docker run -it --rm --env="CONFIG=/seed1.conf" $(whoami)/counter-cluster
 ```
 
 # Development
