@@ -20,7 +20,7 @@ Create table:
 
 ```
 sbt console
-> countercluster.createTables
+> countercluster.DynamoDB.createTables
 ```
 
 
