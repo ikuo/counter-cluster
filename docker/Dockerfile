@@ -10,6 +10,7 @@ RUN apt-get install -y oracle-java8-installer
 RUN wget http://central.maven.org/maven2/org/aspectj/aspectjweaver/1.8.6/aspectjweaver-1.8.6.jar
 
 ADD counter-cluster-assembly-0.1-SNAPSHOT.jar .
+RUN mkdir target/
 
 CMD java \
   -Dconfig.resource=$CONFIG \
