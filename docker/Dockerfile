@@ -1,5 +1,5 @@
 FROM ubuntu:14.04
-MAINTAINER Ikuo Matsumura <steve@scattercode.co.uk>
+MAINTAINER Ikuo Matsumura <makiczar@gmail.com>
 
 RUN apt-get install -y software-properties-common
 RUN add-apt-repository -y ppa:webupd8team/java
