@@ -9,23 +9,28 @@ import scala.concurrent.duration._
 import scala.util.Random
 import kamon.Kamon
 import kamon.trace.Tracer
+import com.typesafe.config.ConfigFactory
 
 class Frontend extends Actor with ActorLogging {
   implicit val ec = context.dispatcher
   implicit val timeout = Timeout(1.seconds)
-  val numOfKeys = 1000
+  val config = ConfigFactory.load.getConfig("counter-cluster.frontend")
+  val initialDelay = config.getLong("initial-delay-millis").millis
+  val interval = config.getLong("interval-millis").millis
+  val numOfKeys = config.getInt("num-of-keys")
   val counter = ClusterSharding(context.system).shardRegion(Counter.shardingName)
   val random = new Random(0)
 
   override def preStart: Unit = {
-    context.system.scheduler.schedule(0.millis, 20.millis) {
-      val trace = Kamon.tracer.newContext("frontend")
-      counter.ask(Counter.Post(s"key${random.nextInt(numOfKeys)}")).
-        recover { case err => err.printStackTrace; log.error(err.getMessage) }.
-        map { i => println(i) }.
-        onComplete { _ => trace.finish() }
-    }
     super.preStart
+    context.system.scheduler.schedule(initialDelay, interval) {
+      val trace = Kamon.tracer.newContext("frontend")
+      val key = s"key${random.nextInt(numOfKeys)}"
+      counter.ask(Counter.Post(key)).
+        recover { case err => err.printStackTrace; log.error(err.getMessage) }.
+        map(i => println(i)).
+        onComplete(_ => trace.finish())
+    }
   }
 
   def receive = {
