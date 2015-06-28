@@ -38,9 +38,3 @@ $ open http://localhost:8000/shell/
 ```
 
 Set `counter-cluster.counter.dynamodb` to `http://localhost:8000` in application.conf.
-
-# Development
-
-```
-sbt> ~re-start --- -Dconfig.resource=/seed1.conf
-```
