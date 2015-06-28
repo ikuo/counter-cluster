@@ -4,16 +4,8 @@ A playground of Akka Cluster/ClusterSharding (on DynamoDB)
 
 ```
 $ brew install forego
-$ brew install dynamodb-local
 $ pushd /tmp && git clone git@github.com:kamon-io/Kamon.git && git checkout release-akka-2.4 && sbt publishLocal
 $ wget http://central.maven.org/maven2/org/aspectj/aspectjweaver/1.8.6/aspectjweaver-1.8.6.jar
-```
-
-Confirm that `dynamodb-local` should work:
-
-```
-$ dynamodb-local
-$ open http://localhost:8000/shell/
 ```
 
 Create table:
@@ -36,6 +28,16 @@ $ forego start
 $ ./scripts/docker-build.sh
 $ docker run -it --rm --env="CONFIG=/seed1.conf" $(whoami)/counter-cluster
 ```
+
+# Using DynamoDB Local
+
+```
+$ brew install dynamodb-local
+$ dynamodb-local
+$ open http://localhost:8000/shell/
+```
+
+Set `counter-cluster.counter.dynamodb` to `http://localhost:8000` in application.conf.
 
 # Development
 
