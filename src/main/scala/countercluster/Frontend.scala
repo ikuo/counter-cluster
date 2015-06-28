@@ -12,11 +12,10 @@ import kamon.trace.Tracer
 
 class Frontend extends Actor with ActorLogging {
   implicit val ec = context.dispatcher
-  val counter = ClusterSharding(context.system).shardRegion(Counter.shardingName)
-  var count = 0
-  val random = new Random(0)
   implicit val timeout = Timeout(1.seconds)
   val numOfKeys = 1000
+  val counter = ClusterSharding(context.system).shardRegion(Counter.shardingName)
+  val random = new Random(0)
 
   override def preStart: Unit = {
     context.system.scheduler.schedule(0.millis, 20.millis) {
@@ -30,10 +29,6 @@ class Frontend extends Actor with ActorLogging {
   }
 
   def receive = {
-    case Frontend.GetCount => sender ! count
+    case () => ()
   }
-}
-
-object Frontend {
-  object GetCount
 }
