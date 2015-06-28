@@ -27,6 +27,8 @@ libraryDependencies ++= {
     "com.google.guava" % "guava" % "18.0",
     "com.amazonaws" % "aws-java-sdk-dynamodb" % awsSdkVersion,
     "com.amazonaws" % "aws-java-sdk-core" % awsSdkVersion,
+    "org.iq80.leveldb"            % "leveldb"          % "0.7",
+    "org.fusesource.leveldbjni"   % "leveldbjni-all"   % "1.8",
     "io.kamon" %% s"kamon-core$kamonSuffix" % kamonVersion,
     "io.kamon" %% s"kamon-scala$kamonSuffix" % kamonVersion,
     "io.kamon" %% s"kamon-akka$kamonSuffix" % kamonVersion,
