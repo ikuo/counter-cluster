@@ -25,9 +25,9 @@ class Frontend extends Actor with ActorLogging {
     super.preStart
     context.system.scheduler.schedule(initialDelay, interval) {
       val trace = Kamon.tracer.newContext("frontend")
-      val key = s"key${random.nextInt(numOfKeys)}"
+      val key = List("key", random.nextInt(numOfKeys)).mkString
       counter.ask(Counter.Post(key)).
-        recover { case err => err.printStackTrace; log.error(err.getMessage) }.
+        recover { case err => log.error(err.getMessage) }.
         map(i => println(i)).
         onComplete(_ => trace.finish())
     }
