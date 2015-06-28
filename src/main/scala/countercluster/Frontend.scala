@@ -20,14 +20,23 @@ class Frontend extends Actor with ActorLogging {
   val numOfKeys = config.getInt("num-of-keys")
   val counter = ClusterSharding(context.system).shardRegion(Counter.shardingName)
   val random = new Random(0)
+  private object Metrics {
+    val sent = Kamon.metrics.counter("frontend.sent")
+    val error = Kamon.metrics.counter("frontend.error")
+  }
 
   override def preStart: Unit = {
     super.preStart
     context.system.scheduler.schedule(initialDelay, interval) {
       val trace = Kamon.tracer.newContext("frontend")
       val key = List("key", random.nextInt(numOfKeys)).mkString
+      Metrics.sent.increment()
       counter.ask(Counter.Post(key)).
-        recover { case err => log.error(err.getMessage) }.
+        recover {
+          case err =>
+            Metrics.error.increment()
+            log.error(err.getMessage)
+        }.
         map(i => println(i)).
         onComplete(_ => trace.finish())
     }
