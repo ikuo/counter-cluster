@@ -17,25 +17,27 @@ class Counter extends PersistentActor with ActorLogging with Buckets[SimpleMovin
   override val receiveCommand: Receive = {
     case Counter.Post(key) =>
       metrics.increment()
-      val value = getValue(key).getOrElse(SimpleMovingAverage(10, 6))
-      value.increment
-      createOrUpdateBucketAndPiece(key, value)
-      sender ! value.value
+      try {
+        val value = getValue(key).getOrElse(SimpleMovingAverage(10, 6))
+        value.increment
+        createOrUpdateBucketAndPiece(key, value)
+        sender ! value.value
+      } catch {
+        case err: Throwable => log.error("err", err)
+      }
 
     case Counter.Get(key) => sender ! getValue(key).map(_.value)
   }
 
   override val receiveRecover: Receive = {
-    case msg => log.info(s"receiveRecover $msg")
+    case msg => log.info(s"Recovered: $buckets")
   }
 
-  override def preStart: Unit = {
+  override def preStart: Unit =
     loadBuckets.map { _ =>
       context.system.scheduler.schedule(0.seconds, 10.seconds)(saveBuckets)
       self ! Recover()
     }
-    super.preStart()
-  }
 
   override def postStop: Unit = {
     saveBuckets
