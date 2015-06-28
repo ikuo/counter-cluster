@@ -26,6 +26,8 @@ class Counter extends PersistentActor with ActorLogging with Buckets[SimpleMovin
         case err: Throwable => log.error("err", err)
       }
 
+    case SaveBuckets      => saveBuckets
+
     case Counter.Get(key) => sender ! getValue(key).map(_.value)
   }
 
@@ -35,7 +37,7 @@ class Counter extends PersistentActor with ActorLogging with Buckets[SimpleMovin
 
   override def preStart: Unit =
     loadBuckets.map { _ =>
-      context.system.scheduler.schedule(0.seconds, 10.seconds)(saveBuckets)
+      context.system.scheduler.schedule(0.seconds, 10.seconds)(self ! SaveBuckets)
       self ! Recover()
     }
 

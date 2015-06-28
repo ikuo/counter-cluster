@@ -18,7 +18,7 @@ trait Buckets[Value] {
     bucket.isDirty = true
   }
 
-  protected def saveBuckets: Seq[Future[Unit]] =
+  protected def saveBuckets: Seq[Unit] =
     buckets.zipWithIndex.withFilter(_._1.isDirty).map {
       case (bucket, index) => bucket.save(persistenceId, index)
     }
@@ -64,16 +64,15 @@ trait Buckets[Value] {
     import Bucket._
     def isFull = pieces.size >= 10
     def serialized = pieces.map(serialize(_)).mkString(delimiter)
-    def save(persistenceId: String, bucketId: Int)(implicit ec: ExecutionContext): Future[Unit] = {
+    def save(persistenceId: String, bucketId: Int): Unit = {
       val entity = new BucketRecord(persistenceId, bucketId, serialized)
-      Future {
-        mapper.save(entity)
-        this.isDirty = false
-      }
+      mapper.save(entity)
+      this.isDirty = false
     }
   }
   object Bucket {
     val delimiter = "/"
     def apply(string: String): Bucket = Bucket(pieces = HashSet(string.split(delimiter).map(Piece(_)): _*))
   }
+  object SaveBuckets
 }
