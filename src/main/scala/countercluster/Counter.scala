@@ -4,16 +4,19 @@ import akka.actor._
 import akka.cluster._
 import akka.cluster.sharding._
 import akka.persistence._
+import kamon.Kamon
 import ClusterEvent._
 
 class Counter extends PersistentActor with ActorLogging with Buckets[SimpleMovingAverage] {
   import Counter._
   implicit val ec = context.dispatcher
+  private val metrics = Kamon.metrics.counter("counter.receive.command")
 
   override val persistenceId: String = shardingName + "-" + self.path.name
 
   override val receiveCommand: Receive = {
     case Counter.Post(key) =>
+      metrics.increment()
       val value = getValue(key).getOrElse(SimpleMovingAverage(10, 6))
       value.increment
       createOrUpdateBucketAndPiece(key, value)
