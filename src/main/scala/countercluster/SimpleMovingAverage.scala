@@ -4,13 +4,14 @@ import com.google.common.collect.EvictingQueue
 case class SimpleMovingAverage(
     intervalSec: Long,
     numOfIntervals: Int,
+    _startedAt: Option[Long] = None,
     initialCount: Int = 0,
     _queue: Option[EvictingQueue[Int]] = None) {
   import SimpleMovingAverage._
   require(intervalSec > 0)
-  private var startedAt = System.currentTimeMillis() / 1000
-  private var _count = initialCount
+  private var startedAt = _startedAt.getOrElse(System.currentTimeMillis() / 1000)
   private val queue = _queue.getOrElse(EvictingQueue.create[Int](numOfIntervals))
+  private var _count = initialCount
 
   def increment: Unit = { refresh; this._count += 1 }
 
@@ -37,7 +38,9 @@ case class SimpleMovingAverage(
   }
   def count = _count
 
-  def serialize = (intervalSec :: numOfIntervals :: _count :: values).mkString(delimiter)
+  def serialize =
+    (intervalSec :: numOfIntervals :: startedAt :: _count :: values).
+      mkString(delimiter)
 }
 
 object SimpleMovingAverage {
@@ -48,9 +51,10 @@ object SimpleMovingAverage {
     queue
   }
   def parse(string: String) = string.split(delimiter).toList match {
-    case intervalSec :: _size :: count :: values =>
+    case intervalSec :: _size :: _startedAt :: count :: values =>
       val size = _size.toInt
-      SimpleMovingAverage(intervalSec.toLong, size, count.toInt, Some(makeQueue(size, values)))
+      val startedAt = _startedAt.toLong
+      SimpleMovingAverage(intervalSec.toLong, size, Some(startedAt), count.toInt, Some(makeQueue(size, values)))
     case _ => sys.error(s"Malformed SimpleMovingAverage '$string'")
   }
 }
