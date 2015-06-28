@@ -36,7 +36,7 @@ class Frontend extends Actor with ActorLogging {
         recover {
           case err =>
             Metrics.error.increment()
-            log.error(s"Error on $key: ${err.getMessage}")
+            log.error(s"Error on $key(${Counter.shardKey(key)}, ${Counter.entryKey(key)}): ${err.getMessage}")
         }.
         map { i =>
           Metrics.recv.increment()
