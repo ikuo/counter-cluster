@@ -10,11 +10,11 @@ RUN apt-get install -y oracle-java8-installer
 
 RUN wget http://central.maven.org/maven2/org/aspectj/aspectjweaver/1.8.6/aspectjweaver-1.8.6.jar
 
+RUN apt-get install -y curl
+
 ADD counter-cluster-assembly-0.1-SNAPSHOT.jar .
+ADD startup.sh .
+RUN chmod a+x ./startup.sh
 RUN mkdir target/
 
-CMD java \
-  -Dakka.cluster.seed-nodes.0=$SEED0 \
-  -Dconfig.resource=$CONFIG \
-  -javaagent:aspectjweaver-1.8.6.jar \
-  -jar counter-cluster-assembly-0.1-SNAPSHOT.jar
+CMD ["./startup.sh"]
