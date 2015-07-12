@@ -14,6 +14,7 @@ ADD counter-cluster-assembly-0.1-SNAPSHOT.jar .
 RUN mkdir target/
 
 CMD java \
+  -Dakka.cluster.seed-nodes.0=$SEED0 \
   -Dconfig.resource=$CONFIG \
   -javaagent:aspectjweaver-1.8.6.jar \
   -jar counter-cluster-assembly-0.1-SNAPSHOT.jar

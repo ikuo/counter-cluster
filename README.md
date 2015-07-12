@@ -26,7 +26,7 @@ $ forego start
 
 ```
 $ ./scripts/docker-build.sh
-$ docker run -it --rm --env="CONFIG=/seed1.conf" $(whoami)/counter-cluster
+$ ./scripts/docker-run.sh
 ```
 
 # Using DynamoDB Local
