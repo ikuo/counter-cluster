@@ -1,9 +1,10 @@
 #!/bin/sh
 docker run -it --rm \
-  --env="AKKA_HOSTNAME=seed1" \
-  --env="CONFIG=/seed1.conf" \
-  --env="SEED0=akka.tcp://cluster@127.0.0.1:2551" \
-  --add-host="seed1:127.0.0.1" \
+  --env="AKKA_HOSTNAME=seed0" \
+  --env="AKKA_PORT=2551" \
+  --env="CONFIG=/seed0.conf" \
+  --env="SEED0=akka.tcp://cluster@seed0:2551" \
+  --add-host="seed0:127.0.0.1" \
   -p 2551 \
-  --name=seed1 \
+  --name=seed0 \
   $(whoami)/counter-cluster
