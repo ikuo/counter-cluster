@@ -1,0 +1,13 @@
+<configuration>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>log/cc.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d,%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>

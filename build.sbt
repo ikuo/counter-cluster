@@ -23,6 +23,8 @@ libraryDependencies ++= {
     "com.typesafe.akka" % "akka-cluster_2.11" % akkaVersion,
     "com.typesafe.akka" % "akka-cluster-sharding_2.11" % akkaVersion,
     "com.typesafe.akka" %% "akka-persistence-experimental" % akkaVersion,
+    "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
+    "ch.qos.logback" % "logback-classic" % "1.0.13",
     "com.github.jdgoldie" %% "akka-persistence-shared-inmemory" % "1.0.16",
     "com.google.guava" % "guava" % "18.0",
     "com.amazonaws" % "aws-java-sdk-dynamodb" % awsSdkVersion,

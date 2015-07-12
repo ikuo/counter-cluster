@@ -15,6 +15,6 @@ RUN apt-get install -y curl
 ADD counter-cluster-assembly-0.1-SNAPSHOT.jar .
 ADD startup.sh .
 RUN chmod a+x ./startup.sh
-RUN mkdir target/
+RUN mkdir target/ && mkdir log/
 
 CMD ["./startup.sh"]
