@@ -15,6 +15,8 @@ sbt console
 > countercluster.DynamoDB.createTables
 ```
 
+Update read/write throuput to 50 units.
+
 # Running in sbt
 
 ```
