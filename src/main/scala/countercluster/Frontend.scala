@@ -25,26 +25,28 @@ class Frontend extends Actor with ActorLogging {
 
   override def preStart: Unit = {
     super.preStart
-    context.system.scheduler.schedule(initialDelay, interval) {
-      val trace = Kamon.tracer.newContext("frontend")
-      val key = List("key", random.nextInt(numOfKeys)).mkString
-      Metrics.sent.increment()
-      counter.ask(Counter.Post(key)).
-        recover {
-          case err =>
-            Metrics.error.increment()
-            log.error(s"Error on $key(${Counter.shardKey(key)}, ${Counter.entryKey(key)}): ${err.getMessage}")
-        }.
-        map { i =>
-          Metrics.recv.increment()
-          log.info(s"Recv: $i")
-        }.
-        onComplete(_ => trace.finish())
-    }
+    context.system.scheduler.schedule(initialDelay, interval) { postMessage }
   }
 
   def receive = {
     case () => ()
+  }
+
+  private def postMessage: Unit = {
+    val trace = Kamon.tracer.newContext("frontend")
+    val key = List("key", random.nextInt(numOfKeys)).mkString
+    Metrics.sent.increment()
+    counter.ask(Counter.Post(key)).
+      recover {
+        case err =>
+          Metrics.error.increment()
+          log.error(s"Error on $key(${Counter.shardKey(key)}, ${Counter.entryKey(key)}): ${err.getMessage}")
+      }.
+      map { i =>
+        Metrics.recv.increment()
+        log.info(s"Recv: $i")
+      }.
+      onComplete(_ => trace.finish())
   }
 }
 
