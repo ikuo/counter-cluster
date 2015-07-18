@@ -51,7 +51,10 @@ object Frontend {
   val initialDelay = config.getLong("initial-delay-millis").millis
   val interval = config.getLong("interval-millis").millis
   val numOfKeys = config.getInt("num-of-keys")
+  val numOfActors = config.getInt("num-of-actors")
   def run(system: ActorSystem): Unit = {
-    system.actorOf(Props(classOf[Frontend]), "frontend") ! 'Run
+    for (i <- (1 to numOfActors)) {
+      system.actorOf(Props(classOf[Frontend]), s"frontend-$i") ! 'Run
+    }
   }
 }
