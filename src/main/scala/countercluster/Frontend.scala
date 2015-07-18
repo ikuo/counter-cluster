@@ -12,12 +12,9 @@ import kamon.trace.Tracer
 import com.typesafe.config.ConfigFactory
 
 class Frontend extends Actor with ActorLogging {
+  import Frontend._
   implicit val ec = context.dispatcher
   implicit val timeout = Timeout(1.seconds)
-  val config = ConfigFactory.load.getConfig("counter-cluster.frontend")
-  val initialDelay = config.getLong("initial-delay-millis").millis
-  val interval = config.getLong("interval-millis").millis
-  val numOfKeys = config.getInt("num-of-keys")
   val counter = ClusterSharding(context.system).shardRegion(Counter.shardingName)
   val random = new Random(0)
   private object Metrics {
@@ -48,5 +45,15 @@ class Frontend extends Actor with ActorLogging {
 
   def receive = {
     case () => ()
+  }
+}
+
+object Frontend {
+  val config = ConfigFactory.load.getConfig("counter-cluster.frontend")
+  val initialDelay = config.getLong("initial-delay-millis").millis
+  val interval = config.getLong("interval-millis").millis
+  val numOfKeys = config.getInt("num-of-keys")
+  def run(system: ActorSystem): Unit = {
+    system.actorOf(Props(classOf[Frontend]), "frontend")
   }
 }

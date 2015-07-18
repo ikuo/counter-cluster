@@ -16,7 +16,7 @@ object Main {
       case "counter" => Counter.startSharding(proxyOnlyMode = false)
       case "frontend" =>
         Counter.startSharding()
-        system.actorOf(Props(classOf[Frontend]), "frontend")
+        Frontend.run(system)
       case role => sys.error(s"Unexpected role $role")
     }
   }
