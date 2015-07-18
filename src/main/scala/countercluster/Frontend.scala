@@ -20,6 +20,7 @@ class Frontend extends Actor with ActorLogging {
   private object Metrics {
     val sent = Kamon.metrics.counter("frontend.sent")
     val recv = Kamon.metrics.counter("frontend.recv")
+    val sma = Kamon.metrics.gauge("frontend.sma")(0L)
     val error = Kamon.metrics.counter("frontend.error")
   }
 
@@ -38,9 +39,12 @@ class Frontend extends Actor with ActorLogging {
           Metrics.error.increment()
           log.error(s"Error on $key(${Counter.shardKey(key)}, ${Counter.entryKey(key)}): ${err.getMessage}")
       }.
-      map { i =>
-        Metrics.recv.increment()
-        log.info(s"Recv: $i")
+      map {
+        case value: Double =>
+          Metrics.recv.increment()
+          Metrics.sma.record(value.toLong)
+          log.info(s"Recv: $value")
+        case _ => ()
       }.
       onComplete(_ => trace.finish())
   }
