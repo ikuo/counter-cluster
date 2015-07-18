@@ -40,7 +40,7 @@ class Frontend extends Actor with ActorLogging {
         }.
         map { i =>
           Metrics.recv.increment()
-          println(s"Recv: $i")
+          log.info(s"Recv: $i")
         }.
         onComplete(_ => trace.finish())
     }
