@@ -5,6 +5,7 @@ import akka.cluster._
 import akka.cluster.sharding._
 import akka.persistence._
 import kamon.Kamon
+import com.typesafe.config.ConfigFactory
 import ClusterEvent._
 
 class Counter extends PersistentActor with ActorLogging with Buckets[SimpleMovingAverage] {
@@ -51,14 +52,17 @@ class Counter extends PersistentActor with ActorLogging with Buckets[SimpleMovin
 }
 
 object Counter {
+  val shardingName = "Counter"
+  val config = ConfigFactory.load.getConfig("counter-cluster.counter")
+  val numOfShards = config.getInt("num-of-shards")
+  val entriesPerShard = config.getInt("entries-per-shard")
+
   def shardKey(id: String) = (id.hashCode % numOfShards).toString
-  def entryKey(id: String) = (id.hashCode % (numOfShards * 4)).toString
+  def entryKey(id: String) = (id.hashCode % (numOfShards * entriesPerShard)).toString
+
   case class Post(id: String)
   case class Get(key: String)
 
-  val shardingName = "Counter"
-  val plannedMaxNodes = 6
-  val numOfShards = plannedMaxNodes * 10
   val idExtractor: ShardRegion.IdExtractor = {
     case msg: Counter.Post => (entryKey(msg.id), msg)
   }
