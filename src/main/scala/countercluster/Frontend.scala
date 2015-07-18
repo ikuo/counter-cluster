@@ -23,13 +23,9 @@ class Frontend extends Actor with ActorLogging {
     val error = Kamon.metrics.counter("frontend.error")
   }
 
-  override def preStart: Unit = {
-    super.preStart
-    context.system.scheduler.schedule(initialDelay, interval) { postMessage }
-  }
-
   def receive = {
-    case () => ()
+    case 'Run =>
+      context.system.scheduler.schedule(initialDelay, interval) { postMessage }
   }
 
   private def postMessage: Unit = {
@@ -56,6 +52,6 @@ object Frontend {
   val interval = config.getLong("interval-millis").millis
   val numOfKeys = config.getInt("num-of-keys")
   def run(system: ActorSystem): Unit = {
-    system.actorOf(Props(classOf[Frontend]), "frontend")
+    system.actorOf(Props(classOf[Frontend]), "frontend") ! 'Run
   }
 }
