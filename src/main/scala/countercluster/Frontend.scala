@@ -16,7 +16,7 @@ class Frontend extends Actor with ActorLogging {
   implicit val ec = context.dispatcher
   implicit val timeout = Timeout(1.seconds)
   val counter = ClusterSharding(context.system).shardRegion(Counter.shardingName)
-  val random = new Random(0)
+  val random = new Random()
   private object Metrics {
     val sent = Kamon.metrics.counter("frontend.sent")
     val recv = Kamon.metrics.counter("frontend.recv")
