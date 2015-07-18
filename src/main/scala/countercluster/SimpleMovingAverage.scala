@@ -4,8 +4,8 @@ import com.google.common.collect.EvictingQueue
 case class SimpleMovingAverage(
     intervalSec: Long,
     numOfIntervals: Int,
-    _startedAt: Option[Long] = None,
     initialCount: Int = 0,
+    _startedAt: Option[Long] = None,
     _queue: Option[EvictingQueue[Int]] = None) {
   import SimpleMovingAverage._
   require(intervalSec > 0)
@@ -54,7 +54,7 @@ object SimpleMovingAverage {
     case intervalSec :: _size :: _startedAt :: count :: values =>
       val size = _size.toInt
       val startedAt = _startedAt.toLong
-      SimpleMovingAverage(intervalSec.toLong, size, Some(startedAt), count.toInt, Some(makeQueue(size, values)))
+      SimpleMovingAverage(intervalSec.toLong, size, count.toInt, Some(startedAt), Some(makeQueue(size, values)))
     case _ => sys.error(s"Malformed SimpleMovingAverage '$string'")
   }
 }
