@@ -38,7 +38,9 @@ class Counter extends PersistentActor with ActorLogging with Buckets[SimpleMovin
 
   override def preStart: Unit =
     loadBuckets.map { _ =>
-      context.system.scheduler.schedule(0.seconds, 10.seconds)(self ! SaveBuckets)
+      context.system.scheduler.schedule(0.seconds, saveBucketsInterval) {
+        self ! SaveBuckets
+      }
       self ! Recover()
     }
 
@@ -56,6 +58,10 @@ object Counter {
   val config = ConfigFactory.load.getConfig("counter-cluster.counter")
   val numOfShards = config.getInt("num-of-shards")
   val entriesPerShard = config.getInt("entries-per-shard")
+  val saveBucketsInterval = Duration(
+    config.getDuration("save-buckets-interval").toMillis,
+    "millis"
+  )
 
   def shardKey(id: String) = (id.hashCode % numOfShards).toString
   def entryKey(id: String) = (id.hashCode % (numOfShards * entriesPerShard)).toString
