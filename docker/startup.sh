@@ -10,8 +10,8 @@ echo Using MAX_HEAP_SIZE: ${MAX_HEAP_SIZE:=800m}
 export MAX_HEAP_SIZE
 
 java \
+  -Xmx$MAX_HEAP_SIZE \
   -Dakka.cluster.seed-nodes.0=$SEED0 \
   -Dconfig.resource=$CONFIG \
-  -Xmx=$MAX_HEAP_SIZE \
   -javaagent:aspectjweaver-1.8.6.jar \
   -jar counter-cluster-assembly-0.1-SNAPSHOT.jar
