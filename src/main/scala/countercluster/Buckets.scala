@@ -12,7 +12,8 @@ trait Buckets[Value] {
 
   def getValue(key: String): Option[Value] = pieces.get(key).map(_._1.value)
 
-  protected def createOrUpdateBucketAndPiece(key: String, value: Value): Unit = {
+  // Update value by creating or updating a piece and a bucket.
+  protected def setValue(key: String, value: Value): Unit = {
     val (piece, bucket) = pieces.getOrElseUpdate(key, newPiece(key, value))
     piece.value = value
     bucket.isDirty = true

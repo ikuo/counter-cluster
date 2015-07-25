@@ -37,7 +37,7 @@ class BucketsSpec extends SpecificationLike {
     class TargetBucket(id: String) extends Buckets[String] {
       override val persistenceId = id
       override val ec = ExecutionContext.Implicits.global
-      def put(key: String, value: String) = createOrUpdateBucketAndPiece(key, value)
+      def put(key: String, value: String) = setValue(key, value)
       def save = saveBuckets
       def load = loadBuckets
       def parse(key: String, value: String) = Piece(key, value)

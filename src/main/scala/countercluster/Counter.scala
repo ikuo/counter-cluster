@@ -21,7 +21,7 @@ class Counter extends PersistentActor with ActorLogging with Buckets[SimpleMovin
       try {
         val value = getValue(key).getOrElse(SimpleMovingAverage(10, 6))
         value.increment
-        createOrUpdateBucketAndPiece(key, value)
+        setValue(key, value)
         sender ! value.value
       } catch {
         case err: Throwable => log.error("err", err)
