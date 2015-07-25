@@ -17,7 +17,7 @@ resolvers += "Scalaz Bintray Repo" at "https://dl.bintray.com/scalaz/releases"
 libraryDependencies ++= {
   val akkaVersion = "2.4-M1"
   val awsSdkVersion = "1.9.40"
-  val kamonVersion = "0.4.1-SNAPSHOT"
+  val kamonVersion = "0.4.1-35bb09838d1b0a2a1e36cd68c2db158b728a2981"
   val kamonSuffix = "_akka-2.4"
   Seq(
     "com.typesafe.akka" % "akka-cluster_2.11" % akkaVersion,
