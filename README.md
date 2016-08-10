@@ -1,5 +1,7 @@
 A playground of Akka Cluster/ClusterSharding (on DynamoDB)
 
+Used in this experiment: https://adtech.cyberagent.io/scalablog/2015/08/07/akka-cluster-sharding-dynamodb/
+
 # Setup
 
 ```
